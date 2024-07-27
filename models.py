@@ -23,6 +23,7 @@ class Student(Base):
     name = Column(String(30), nullable=False)
     fullname = Column(String(100), nullable=False)
     group_id = Column(Integer, ForeignKey(Group.id, ondelete='CASCADE'))
+    relationship('Group', backref='groups', cascade='all')
 
 
 class Teacher(Base):
@@ -32,11 +33,12 @@ class Teacher(Base):
     fullname = Column(String(100), nullable=False)
 
 
-class Subjects(Base):
+class Subject(Base):
     __tablename__ = 'subjects'
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    teacher_id = Column(Integer, ForeignKey(Group.id))
+    teacher_id = Column(Integer, ForeignKey(Teacher.id, ondelete='CASCADE'))
+    relationship('Teacher', backref='teachers', cascade='all')
 
 
 class Mark(Base):
@@ -44,5 +46,7 @@ class Mark(Base):
     id = Column(Integer, primary_key=True)
     note = Column(Integer, nullable=False)
     date = Column(DateTime, default=datetime.now())
-    student = relationship('Student', backref='students')
-    teacher = relationship('Teacher', backref='teachers')
+    student_id = Column(Integer, ForeignKey(Student.id, ondelete='CASCADE'))
+    subject_id = Column(Integer, ForeignKey(Subject.id, ondelete='CASCADE'))
+    student = relationship('Student', backref='students', cascade='all')
+    subject = relationship('Subject', backref='subjects', cascade='all')
