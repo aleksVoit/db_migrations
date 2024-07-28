@@ -137,14 +137,81 @@ async def select_7(subject: str, group: str):
         [print(row) for row in rows]
 
 
+async def select_8(teacher: str):
+    """
+    to find an average note which gives specified lektor at his subjects
+    """
+    async with async_session as session:
+        stmt = select(
+            Teacher.fullname,
+            Subject.name,
+            func.round(func.avg(Mark.note), 2).label('avg_note')
+        ).select_from(Mark).join(Subject).join(Teacher).where(
+            Teacher.fullname == teacher
+        ).group_by(
+            Teacher.fullname,
+            Subject.name
+        )
+
+        result = await session.execute(stmt)
+        rows = result.fetchall()
+        [print(row) for row in rows]
+
+
+async def select_9(student: str):
+    """
+    to find the list of subjects which attend a specific student
+    """
+    async with async_session as session:
+        stmt = select(
+            Student.fullname,
+            Subject.name
+        ).select_from(Mark).join(Subject).join(Student).where(
+            Student.fullname == student
+        ).group_by(
+            Student.fullname,
+            Subject.name
+        )
+
+        result = await session.execute(stmt)
+        rows = result.fetchall()
+        [print(row) for row in rows]
+
+
+async def select_10(teacher: str, student: str):
+    """
+    to find the list of subjects which specific teacher teach specific student
+    """
+    async with async_session as session:
+        stmt = select(
+            Subject.name,
+            Student.fullname,
+            Teacher.fullname
+        ).select_from(Mark).join(Subject).join(Teacher).join(Student).where(
+            Teacher.fullname == teacher,
+            Student.fullname == student
+        ).group_by(
+            Subject.name,
+            Teacher.fullname,
+            Student.fullname
+        )
+
+        result = await session.execute(stmt)
+        rows = result.fetchall()
+        [print(row) for row in rows]
+
+
 async def main():
-    # await select_1()
-    # await select_2('Sport')
-    # await select_3('Sport')
-    # await select_4()
-    # await select_5('Sarah Shelton')
-    # await select_6('23-05')
+    await select_1()
+    await select_2('Sport')
+    await select_3('Sport')
+    await select_4()
+    await select_5('Sarah Shelton')
+    await select_6('23-05')
     await select_7('Sport', '23-05')
+    await select_8('Sarah Shelton')
+    await select_9('Melissa Larsen')
+    await select_10('Heather Davis', 'Nathan Wilson')
 
 if __name__ == '__main__':
     asyncio.run(main())
