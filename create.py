@@ -94,11 +94,11 @@ async def give_marks(note: int, exam_date: date, student_fullname: str, subject_
 
 
 async def init_tables():
-    await create_groups('24-01')
-    await create_student('Vasil Pupkin', '24-01')
-    await create_teachers('Vasil Petrovich')
-    await create_subjects('Python', 'Vasil Petrovich')
-    await give_marks(99, date(2024, 5, 5), 'Vasil Pupkin', 'Python')
+    # await create_groups('24-01')
+    # await create_student('Nathan Wilson', '23-05')
+    # await create_teachers('Vasil Petrovich')
+    await create_subjects('Python', 'Heather Davis')
+    await give_marks(99, date(2024, 5, 5), 'Nathan Wilson', 'Python')
 
 
 if __name__ == '__main__':
