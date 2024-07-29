@@ -5,22 +5,12 @@ import sqlalchemy.exc
 
 from connect_db import async_session
 from models import Group, Student, Teacher, Subject, Mark
-from faker import Faker
-from random import randint, choice, sample
 from sqlalchemy.future import select
-from sqlalchemy.sql import text
 
-import logging
-
-logger = logging.getLogger('my_logger')
-logger.setLevel(logging.DEBUG)
-
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(message)s ')
-logging.basicConfig(level=logging.INFO, format='%(name)s %(message)s')
+from logger import logger
 
 
-async def create_groups(group_name: str):
+async def create_group(group_name: str):
     async with async_session as session:
         group = Group(number=group_name)
         try:
@@ -28,7 +18,7 @@ async def create_groups(group_name: str):
             await session.commit()
             logger.debug(f'created group - {group_name}')
         except sqlalchemy.exc.IntegrityError as err:
-            logging.debug(f'Error - {err}')
+            logger.debug(f'Error - {err}')
 
 
 async def create_student(fullname: str, group_number: str):
@@ -44,10 +34,10 @@ async def create_student(fullname: str, group_number: str):
                 await session.commit()
                 logger.debug(f'created student - {fullname}')
             except sqlalchemy.exc.IntegrityError as err:
-                logging.debug(f'Error - {err}')
+                logger.debug(f'Error - {err}')
 
 
-async def create_teachers(fullname: str):
+async def create_teacher(fullname: str):
     name = fullname.split(' ')[-2:][0]
     async with async_session as session:
         teacher = Teacher(name=name, fullname=fullname)
@@ -56,10 +46,10 @@ async def create_teachers(fullname: str):
             await session.commit()
             logger.debug(f'created teacher - {fullname}')
         except sqlalchemy.exc.IntegrityError as err:
-            logging.debug(f'Error - {err}')
+            logger.debug(f'Error - {err}')
 
 
-async def create_subjects(name: str, teacher_fullname: str):
+async def create_subject(name: str, teacher_fullname: str):
     async with async_session as session:
         async with session.begin():
             stmt = select(Teacher.id).where(Teacher.fullname == teacher_fullname)
@@ -71,10 +61,10 @@ async def create_subjects(name: str, teacher_fullname: str):
                 await session.commit()
                 logger.debug(f'created subject - {name}')
             except sqlalchemy.exc.IntegrityError as err:
-                logging.debug(f'Error - {err}')
+                logger.debug(f'Error - {err}')
 
 
-async def give_marks(note: int, exam_date: date, student_fullname: str, subject_name: str):
+async def give_mark(note: int, exam_date: date, student_fullname: str, subject_name: str):
     async with async_session as session:
         async with session.begin():
             stmt = select(Student.id).where(Student.fullname == student_fullname)
@@ -90,15 +80,15 @@ async def give_marks(note: int, exam_date: date, student_fullname: str, subject_
                 session.add(mark)
                 await session.commit()
             except sqlalchemy.exc.IntegrityError as err:
-                logging.debug(f'Error - {err}')
+                logger.debug(f'Error - {err}')
 
 
 async def init_tables():
-    # await create_groups('24-01')
-    # await create_student('Nathan Wilson', '23-05')
-    # await create_teachers('Vasil Petrovich')
-    await create_subjects('Python', 'Heather Davis')
-    await give_marks(99, date(2024, 5, 5), 'Nathan Wilson', 'Python')
+    await create_group('24-01')
+    await create_student('Nathan Wilson', '23-05')
+    await create_teacher('Vasil Petrovich')
+    await create_subject('Python', 'Heather Davis')
+    await give_mark(99, date(2024, 5, 5), 'Nathan Wilson', 'Python')
 
 
 if __name__ == '__main__':

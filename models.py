@@ -29,8 +29,8 @@ class Student(Base):
 class Teacher(Base):
     __tablename__ = 'teachers'
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False, unique=True)
-    fullname = Column(String(100), nullable=False)
+    name = Column(String(30), nullable=False)
+    fullname = Column(String(100), nullable=False, unique=True)
 
 
 class Subject(Base):

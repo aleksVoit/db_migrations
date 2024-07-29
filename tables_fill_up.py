@@ -6,9 +6,8 @@ from models import Group, Student, Teacher, Subject, Mark
 from faker import Faker
 from random import randint, choice, sample
 from sqlalchemy.future import select
-from sqlalchemy.sql import text
 
-from create import create_teachers, create_subjects, create_groups, create_student, give_marks
+from create import create_teacher, create_subject, create_group, create_student, give_mark
 
 faker = Faker()
 
@@ -21,7 +20,7 @@ async def init_groups(quantity: int):
         group_name = f'{year}-{number}'
         if group_name not in groups:
             groups.append(group_name)
-            await create_groups(group_name)
+            await create_group(group_name)
         if len(groups) == quantity:
             break
 
@@ -39,7 +38,7 @@ async def init_students(quantity: int):
 async def init_teachers(quantity: int):
     for _ in range(quantity):
         full_name = faker.name()
-        await create_teachers(full_name)
+        await create_teacher(full_name)
 
 
 async def init_subjects(quantity: int):
@@ -59,10 +58,10 @@ async def init_subjects(quantity: int):
             t_name = choice(teachers_names)
             if t_name not in used_names:
                 used_names.append(t_name)
-                await create_subjects(subject, t_name)
+                await create_subject(subject, t_name)
                 break
             elif len(used_names) == len(teachers_names):
-                await create_subjects(subject, choice(teachers_names))
+                await create_subject(subject, choice(teachers_names))
                 break
 
 
@@ -83,7 +82,7 @@ async def init_marks(quantity: int):
         exam_date = generate_random_work_day()
         subject = choose_subject(subjects, used_subjects)
         for student in students:
-            await give_marks(randint(1, 100), exam_date, student.fullname, subject.name)
+            await give_mark(randint(1, 100), exam_date, student.fullname, subject.name)
 
 
 def choose_subject(subjects, used_subjects):
