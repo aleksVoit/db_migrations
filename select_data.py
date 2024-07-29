@@ -2,8 +2,7 @@ import asyncio
 
 from connect_db import async_session
 from models import Group, Student, Teacher, Subject, Mark
-from sqlalchemy import delete, select, distinct, func, desc
-from sqlalchemy.sql import text
+from sqlalchemy import select, func, desc
 
 
 async def select_1():
@@ -201,17 +200,77 @@ async def select_10(teacher: str, student: str):
         [print(row) for row in rows]
 
 
+async def select_1add(teacher: str, student: str):
+    """
+    to find the average note which specific teacher gives to the specific student
+    """
+    async with async_session as session:
+        stmt = select(
+            func.round(func.avg(Mark.note), 2).label('avg_note'),
+            Teacher.fullname.label('teacher'),
+            Student.fullname.label('student'),
+        ).select_from(Mark).join(Subject).join(Teacher).join(Student).where(
+            Teacher.fullname == teacher,
+            Student.fullname == student
+        ).group_by(
+            Teacher.fullname,
+            Student.fullname
+        )
+
+        result = await session.execute(stmt)
+        rows = result.fetchall()
+        [print(row) for row in rows]
+
+
+async def select_2add(group: str, subject: str):
+    """
+    to find the marks of students of specific group at specific subject on last lecture
+    """
+
+    async with async_session as session:
+        stmt = select(
+            func.max(Mark.date)
+        ).join(Subject).join(Student).join(Group).where(
+            Group.number == group,
+            Subject.name == subject
+        )
+        result = await session.execute(stmt)
+        last_exam = result.fetchone()[0]
+        print(last_exam)
+
+        stmt = select(
+            Mark.note,
+            Student.fullname.label('student'),
+            Mark.date,
+            Subject.name
+        ).select_from(Mark).join(Student).join(Group).join(Subject).where(
+            Mark.date == last_exam
+        ).group_by(
+            Mark.note,
+            Student.fullname,
+            Mark.date,
+            Subject.name
+        ).order_by(
+            Student.fullname
+        )
+        result = await session.execute(stmt)
+        rows = result.fetchall()
+        [print(row) for row in rows]
+
+
 async def main():
-    await select_1()
-    await select_2('Sport')
-    await select_3('Sport')
-    await select_4()
-    await select_5('Sarah Shelton')
-    await select_6('23-05')
-    await select_7('Sport', '23-05')
-    await select_8('Sarah Shelton')
-    await select_9('Melissa Larsen')
-    await select_10('Heather Davis', 'Nathan Wilson')
+    # await select_1()
+    # await select_2('Sport')
+    # await select_3('Sport')
+    # await select_4()
+    # await select_5('Sarah Shelton')
+    # await select_6('23-05')
+    # await select_7('Sport', '23-05')
+    # await select_8('Sarah Shelton')
+    # await select_9('Melissa Larsen')
+    # await select_10('Heather Davis', 'Nathan Wilson')
+    # await select_1add('Heather Davis', 'Nathan Wilson')
+    await select_2add('23-05', 'Philosophy')
 
 if __name__ == '__main__':
     asyncio.run(main())
