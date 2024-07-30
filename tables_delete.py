@@ -10,6 +10,7 @@ async def delete_groups():
         stmt = delete(Group)
         await session.execute(stmt)
         await session.commit()
+        return True
 
 
 async def delete_students():
@@ -17,6 +18,7 @@ async def delete_students():
         stmt = delete(Student)
         await session.execute(stmt)
         await session.commit()
+        return True
 
 
 async def delete_teachers():
@@ -24,6 +26,7 @@ async def delete_teachers():
         stmt = delete(Teacher)
         await session.execute(stmt)
         await session.commit()
+        return True
 
 
 async def delete_subjects():
@@ -31,6 +34,7 @@ async def delete_subjects():
         stmt = delete(Subject)
         await session.execute(stmt)
         await session.commit()
+        return True
 
 
 async def delete_marks():
@@ -38,6 +42,7 @@ async def delete_marks():
         stmt = delete(Mark)
         await session.execute(stmt)
         await session.commit()
+        return True
 
 
 async def delete_tables():
@@ -46,6 +51,7 @@ async def delete_tables():
     await delete_teachers()
     await delete_subjects()
     await delete_marks()
+
 
 if __name__ == '__main__':
     asyncio.run(delete_tables())

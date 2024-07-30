@@ -79,7 +79,7 @@ async def init_marks(quantity: int):
     used_subjects = []
 
     for mark in range(quantity):
-        exam_date = generate_random_work_day()
+        exam_date = generate_random_work_day().strftime('%Y-%m-%d')
         subject = choose_subject(subjects, used_subjects)
         for student in students:
             await give_mark(randint(1, 100), exam_date, student.fullname, subject.name)
